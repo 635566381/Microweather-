@@ -1,26 +1,31 @@
 <template>
-  <view class="container" v-if="weather.city">
-    <view class="top">
-      <view>{{weather.city}}</view>
-      <view v-text="weather.current.formattedDate"></view>
-      <view>{{weather.current.formattedTime}} 更新</view>
-    </view>
-    <view class="topRegion">
-      <view id="temperature">{{weather.current.temperature}}℃</view>
-      <view id="summary">{{weather.current.summary}}</view>
-    </view>
-    <view class="summary">
-      <view>一周天气预报</view>
-      <view style="margin-top:20px">{{weather.daily.summary}}</view>
-    </view>
-    <view class="daily">
-      <view class="daily_item" v-for="(item,index) in weather.daily.data" :key="index">
-        <view class="daily_weekday">{{item.weekday}}</view>
-        <view class="daily_temperature">{{item.temperatureMin}}-{{item.temperatureMax}}℃</view>
-        <view class="daily_summary">{{item.summary}}</view>
+  <div>
+    <view class="container" v-if="weather.city">
+      <view class="top">
+        <view>{{weather.city}}</view>
+        <view v-text="weather.current.formattedDate"></view>
+        <view>{{weather.current.formattedTime}} 更新</view>
+      </view>
+      <view class="topRegion">
+        <view id="temperature">{{weather.current.temperature}}℃</view>
+        <view id="summary">{{weather.current.summary}}</view>
+      </view>
+      <view class="summary">
+        <view>一周天气预报</view>
+        <view style="margin-top:20px">{{weather.daily.summary}}</view>
+      </view>
+      <view class="daily">
+        <view class="daily_item" v-for="(item,index) in weather.daily.data" :key="index">
+          <view class="daily_weekday">{{item.weekday}}</view>
+          <view class="daily_temperature">{{item.temperatureMin}}-{{item.temperatureMax}}℃</view>
+          <view class="daily_summary">{{item.summary}}</view>
+        </view>
       </view>
     </view>
-  </view>
+    <div class="popup" v-if="loading">
+      <div class="loading"></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -30,13 +35,16 @@
     data() {
       return {
         weather: {},
+        loading: false,
       };
     },
     components: {},
     created() {
       let that = this;
+      that.loading = true;
       util.loadWeatherData(function (data) {
         that.weather = data;
+        that.loading = false;
       });
       
     },
@@ -57,6 +65,30 @@
   };
 </script>
 <style scoped>
+  .loading{
+    /*固定loading*/
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /*垂直水平居中*/
+    margin: -20px 0 0 -20px;
+    width: 50px;
+    height: 50px;
+    border: 2px solid;
+    border-color: #333 #333 transparent;
+    border-radius: 50%;
+    box-sizing: border-box;
+    /*动画时间1s，线性变化，无限循环*/
+    animation: loading 1s linear infinite;
+  }
+  @keyframes loading{
+    0%{
+      transform: rotate(0deg);
+    }
+    100%{
+      transform: rotate(360deg);
+    }
+  }
   /**app.wxss**/
   .userinfo {
     display: flex;
@@ -79,9 +111,6 @@
     margin-top: 200px;
   }
   
-  page {
-    height: 100%
-  }
   
   .container {
     height: 100%;
